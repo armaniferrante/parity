@@ -32,7 +32,7 @@ macro_rules! try_bf {
 #[macro_use]
 mod helpers;
 mod impls;
-mod types;
+pub mod types;
 #[cfg(test)]
 mod tests;
 
