@@ -142,6 +142,23 @@ impl ExtendedPublic {
 	pub fn public(&self) -> &Public {
 		&self.public
 	}
+
+	pub fn as_bytes(&self) -> Vec<u8> {
+		let mut buf = self.public[..].to_vec();
+		buf.extend(&self.chain_code.0);
+		buf
+	}
+
+	pub fn from_bytes(buf: &[u8]) -> Result<Self, DerivationError> {
+		if buf.len() != 96 {
+			return Err(derivation::Error::InvalidKey);
+		}
+		let mut pk = [0; 64];
+		pk.copy_from_slice(&buf[0..64]);
+		let mut cc = [0; 32];
+		cc.copy_from_slice(&buf[64..]);
+		Ok(Self::new(Public::from_slice(&pk), H256::from(cc)))
+	}
 }
 
 pub struct ExtendedKeyPair {
@@ -220,6 +237,7 @@ mod derivation {
 	pub enum Error {
 		InvalidHardenedUse,
 		InvalidPoint,
+		InvalidKey,
 		MissingIndex,
 		InvalidSeed,
 	}
